@@ -1,0 +1,9 @@
+[package]
+name = "bin"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ascii-img2 = { version = "0.1.0", path = "../lib" }
+clap = { version = "4.5.54", features = ["derive"] }
+image = { version = "0.25.9", default-features = false, features = ["bmp", "gif", "jpeg", "png", "rayon", "tiff", "webp"] }
