@@ -5,16 +5,22 @@ use image::{GenericImageView as _, open};
 const CHARACTER_ASPECT_RATIO: f32 = 2.2;
 
 #[derive(Clone, Default, ValueEnum)]
-enum Generator {
+enum GeneratorEnum {
     #[default]
-    Luminance,
-    AnsiRgb,
-    Ansi256,
+    Charset,
     HalfBlock,
 }
 
 #[derive(Clone, Default, ValueEnum)]
-enum Preprocessor {
+enum ColorizerEnum {
+    #[default]
+    Null,
+    AnsiRgb,
+    Ansi256,
+}
+
+#[derive(Clone, Default, ValueEnum)]
+enum PreprocessorEnum {
     #[default]
     Basic,
     Null,
@@ -25,12 +31,15 @@ struct Cli {
     pub path: std::path::PathBuf,
 
     #[arg(short, long)]
-    pub generator: Option<Generator>,
+    pub generator: Option<GeneratorEnum>,
 
     #[arg(short, long)]
-    pub preprocessor: Option<Preprocessor>,
+    pub colorizer: Option<ColorizerEnum>,
 
     #[arg(short, long)]
+    pub preprocessor: Option<PreprocessorEnum>,
+
+    #[arg(long)]
     pub charset: Option<String>,
 
     #[arg(long)]
@@ -53,8 +62,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
 
         match cli.preprocessor.unwrap_or_default() {
-            Preprocessor::Basic => BasicPreprocessor { dimensions }.process(&image),
-            Preprocessor::Null => NullPreprocessor.process(&image),
+            PreprocessorEnum::Basic => BasicPreprocessor { dimensions }.process(&image),
+            PreprocessorEnum::Null => NullPreprocessor.process(&image),
         }
     };
 
@@ -64,11 +73,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap_or_else(|| vec![' ', ';', '#']),
     );
 
+    let colorizer: Box<dyn Colorizer> = match cli.colorizer.unwrap_or_default() {
+    	ColorizerEnum::Null => Box::new(NullColorizer),
+    	ColorizerEnum::AnsiRgb => Box::new(AnsiRgbColorizer),
+    	ColorizerEnum::Ansi256 => Box::new(Ansi256Colorizer),
+    };
+
     let grid = match cli.generator.unwrap_or_default() {
-        Generator::Luminance => LuminanceGenerator.generate(&process.into(), &charset)?,
-        Generator::AnsiRgb => AnsiRgbGenerator.generate(&process.into(), &charset)?,
-        Generator::Ansi256 => Ansi256Generator.generate(&process.into(), &charset)?,
-        Generator::HalfBlock => HalfBlockGenerator.generate(&process.into(), &charset)?,
+        GeneratorEnum::Charset => CharsetGenerator.generate(
+        	&process.into(),
+        	&charset,
+        	colorizer.as_ref()
+        )?,
+        GeneratorEnum::HalfBlock => HalfBlockGenerator.generate(
+        	&process.into(),
+        	&charset,
+        	colorizer.as_ref()
+        )?,
     };
 
     for line in grid {

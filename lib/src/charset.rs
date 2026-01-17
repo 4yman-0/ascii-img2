@@ -1,9 +1,7 @@
-/// Maps brightness (0.0–1.0) to a character.
 pub trait Charset: Send + Sync {
     fn map(&self, luminance: f32) -> char;
 }
 
-/// Simple linear charset
 pub struct LinearCharset {
     chars: Vec<char>,
 }
