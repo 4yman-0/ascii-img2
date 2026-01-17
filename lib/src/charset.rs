@@ -18,7 +18,7 @@ impl LinearCharset {
 
 impl Charset for LinearCharset {
     fn map(&self, luminance: f32) -> char {
-        let idx = (luminance.clamp(0.0, 1.0) * (self.chars.len() - 1) as f32).round() as usize;
-        self.chars[idx]
+        let index = (luminance.clamp(0.0, 1.0) * (self.chars.len() - 1) as f32).round() as usize;
+        self.chars[index]
     }
 }

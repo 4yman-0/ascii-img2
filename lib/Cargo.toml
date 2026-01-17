@@ -2,6 +2,9 @@
 name = "ascii-img2"
 version = "0.1.0"
 edition = "2024"
+keywords = [ "ascii-art" ]
+license = "MIT OR Apache-2.0"
+readme = "../README.md"
 
 [dependencies]
 image = { version = "0.25.9", default-features = false }
