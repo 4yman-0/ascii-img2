@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 pub trait Charset: Send + Sync {
     fn map(&self, luminance: f32) -> char;
 }

@@ -1,4 +1,4 @@
-use ascii_img2::{Preprocessor as _, *};
+use ascii_img2::prelude::{Preprocessor as _, *};
 use clap::{Parser, ValueEnum};
 use image::{open, GenericImageView as _};
 

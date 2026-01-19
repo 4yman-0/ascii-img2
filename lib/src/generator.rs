@@ -1,4 +1,5 @@
-use crate::{AsciiError, Charset, Colorizer};
+use alloc::{vec::Vec, string::String};
+use crate::prelude::{AsciiResult, Charset, Colorizer};
 use image::{GenericImageView, Primitive, Rgb, RgbImage};
 
 mod image_lines_ext;
@@ -10,7 +11,7 @@ pub trait AsciiGenerator<T: GenericImageView> {
         image: &T,
         charset: &dyn Charset,
         colorizer: &dyn Colorizer<T::Pixel>,
-    ) -> Result<Vec<String>, AsciiError>;
+    ) -> AsciiResult<Vec<String>>;
 }
 
 /// ASCII generator using luminance
@@ -31,7 +32,7 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
         image: &RgbImage,
         charset: &dyn Charset,
         colorizer: &dyn Colorizer<Rgb<u8>>,
-    ) -> Result<Vec<String>, AsciiError> {
+    ) -> AsciiResult<Vec<String>> {
         let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
 
         for line in image.lines() {
@@ -61,7 +62,7 @@ impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
         image: &RgbImage,
         _charset: &dyn Charset,
         colorizer: &dyn Colorizer<Rgb<u8>>,
-    ) -> Result<Vec<String>, AsciiError> {
+    ) -> AsciiResult<Vec<String>> {
         let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
 
         let mut lines = image.lines();

@@ -123,6 +123,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ascii-img2-cli"
+version = "0.1.0"
+dependencies = [
+ "ascii-img2",
+ "clap",
+ "image",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -169,15 +178,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47c8fbc0f831f4519fe8b810b6a7a91410ec83031b8233f730a0480029f6a23f"
 dependencies = [
  "arrayvec",
-]
-
-[[package]]
-name = "bin"
-version = "0.1.0"
-dependencies = [
- "ascii-img2",
- "clap",
- "image",
 ]
 
 [[package]]

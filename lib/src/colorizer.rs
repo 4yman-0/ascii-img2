@@ -1,3 +1,4 @@
+use alloc::{string::String};
 use image::{Pixel, Rgb};
 
 pub trait Colorizer<T: Pixel> {
@@ -9,15 +10,16 @@ pub struct NullColorizer;
 
 impl<T: Pixel> Colorizer<T> for NullColorizer {
     fn fg(&self, _pixel: &T) -> String {
-        "".to_string()
+        String::new()
     }
     fn bg(&self, _pixel: &T) -> String {
-        "".to_string()
+        String::new()
     }
 }
 
 /// ANSI escape helpers
 pub mod ansi {
+	use alloc::{format, string::String};
     pub const RESET: &str = "\x1b[0m";
 
     #[inline]
