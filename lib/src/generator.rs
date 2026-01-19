@@ -1,5 +1,6 @@
-use alloc::{vec::Vec, string::String};
 use crate::prelude::{AsciiResult, Charset, Colorizer};
+use alloc::{string::String, vec::Vec};
+use core::iter::FromIterator;
 use image::{GenericImageView, Primitive, Rgb, RgbImage};
 
 mod image_lines_ext;
@@ -14,7 +15,18 @@ pub trait AsciiGenerator<T: GenericImageView> {
     ) -> AsciiResult<Vec<String>>;
 }
 
-/// ASCII generator using luminance
+/// An ASCII generator that uses the `Charset` provided to it
+/// ```
+/// use ascii_img2::prelude::*;
+/// let image = image::RgbImage::new(10, 10);
+/// let charset = LinearCharset::new(vec![' ', ';', '&']);
+/// let colorizer = NullColorizer;
+/// CharsetGenerator.generate(
+///     &image,
+///     &charset,
+///     &colorizer,
+/// );
+/// ```
 #[derive(Clone)]
 pub struct CharsetGenerator;
 
@@ -33,27 +45,33 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
         charset: &dyn Charset,
         colorizer: &dyn Colorizer<Rgb<u8>>,
     ) -> AsciiResult<Vec<String>> {
-        let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
-
-        for line in image.lines() {
-            result.push(
-                line.flat_map(|pixel| {
+        Ok(image
+            .lines()
+            .map(|line| {
+                line.map(|pixel| {
                     let lum = Self::luminance(&pixel);
                     let char = charset.map(lum);
-                    colorizer
-                        .fg(&pixel)
-                        .chars()
-                        .chain([char])
-                        .collect::<Vec<char>>()
+                    String::from_iter(colorizer.fg(&pixel).chars().chain([char]))
                 })
-                .collect(),
-            );
-        }
-
-        Ok(result)
+                .collect::<String>()
+            })
+            .collect::<Vec<_>>())
     }
 }
 
+/// An ASCII generator that uses Unicode half block
+/// This generator must be used with a colorizer other than `NullColorizer`
+/// ```
+/// use ascii_img2::prelude::*;
+/// let image = image::RgbImage::new(10, 10);
+/// let charset = LinearCharset::new(vec![' ', ';', '&']);
+/// let colorizer = AnsiRgbColorizer;
+/// HalfBlockGenerator.generate(
+///     &image,
+///     &charset,
+///     &colorizer,
+/// );
+/// ```
 pub struct HalfBlockGenerator;
 
 impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
@@ -64,8 +82,8 @@ impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
         colorizer: &dyn Colorizer<Rgb<u8>>,
     ) -> AsciiResult<Vec<String>> {
         let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
-
         let mut lines = image.lines();
+        
         while let (Some(top_iter), Some(bottom_iter)) = (lines.next(), lines.next()) {
             result.push(
                 top_iter

@@ -1,11 +1,23 @@
-use alloc::{string::String};
+//! Color generation module
+
+use alloc::string::String;
 use image::{Pixel, Rgb};
 
+/// Converts a pixel to a string representation (like ANSI's 24-bit and 8-bit color encoding)
 pub trait Colorizer<T: Pixel> {
+    /// Converts a pixel to a string that controls the color of the character being printed
     fn fg(&self, pixel: &T) -> String;
+
+    /// Converts a pixel to a string that controls the color of the character's background
     fn bg(&self, pixel: &T) -> String;
 }
 
+/// Returns an empty string no matter what pixel is provided
+/// ```
+/// use ascii_img2::prelude::*;
+/// let color = image::Rgb::from([255, 0, 255]);
+/// assert_eq!(NullColorizer.fg(&color), "");
+/// ```
 pub struct NullColorizer;
 
 impl<T: Pixel> Colorizer<T> for NullColorizer {
@@ -17,22 +29,24 @@ impl<T: Pixel> Colorizer<T> for NullColorizer {
     }
 }
 
-/// ANSI escape helpers
-pub mod ansi {
-	use alloc::{format, string::String};
-    pub const RESET: &str = "\x1b[0m";
+/// ANSI color encoding helpers
+mod ansi {
+    use alloc::{format, string::String};
+    //pub const RESET: &str = "\x1b[0m";
 
     #[inline]
+    #[must_use]
     pub fn fg_rgb(r: u8, g: u8, b: u8) -> String {
         format!("\x1b[38;2;{r};{g};{b}m")
     }
 
     #[inline]
+    #[must_use]
     pub fn bg_rgb(r: u8, g: u8, b: u8) -> String {
         format!("\x1b[48;2;{r};{g};{b}m")
     }
 
-    #[inline]
+    #[must_use]
     const fn rgb_to_256(r: u8, g: u8, b: u8) -> u8 {
         // Check for grayscale first
         if r == g && g == b {
@@ -45,23 +59,27 @@ pub mod ansi {
             return 232 + grayscale;
         }
 
-        // Convert RGB components to 0–5 range
+        // Convert RGB to 0–5 range
         let r = (r as u16 * 5 / 255) as u8;
         let g = (g as u16 * 5 / 255) as u8;
         let b = (b as u16 * 5 / 255) as u8;
 
-		assert!(r <= 5);
-		assert!(g <= 5);
-		assert!(b <= 5);
+        assert!(r <= 5);
+        assert!(g <= 5);
+        assert!(b <= 5);
 
         // 16 is the start of the 6×6×6 color cube
         16 + (36 * r) + (6 * g) + b
     }
 
+    #[inline]
+    #[must_use]
     pub fn fg_256(r: u8, g: u8, b: u8) -> String {
         format!("\x1b[38;5;{}m", rgb_to_256(r, g, b))
     }
 
+    #[inline]
+    #[must_use]
     pub fn bg_256(r: u8, g: u8, b: u8) -> String {
         format!("\x1b[48;5;{}m", rgb_to_256(r, g, b))
     }

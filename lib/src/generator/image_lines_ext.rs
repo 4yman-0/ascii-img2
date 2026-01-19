@@ -18,6 +18,14 @@ impl<'a, T: GenericImageView> Iterator for Line<'a, T> {
             Some(pixel)
         }
     }
+
+    fn nth(&mut self, index: usize) -> Option<Self::Item> {
+        if index >= self.width as _ {
+            None
+        } else {
+            Some(self.image.get_pixel(index as _, self.y))
+        }
+    }
 }
 
 pub struct Lines<'a, T: GenericImageView> {
@@ -29,7 +37,7 @@ pub struct Lines<'a, T: GenericImageView> {
 
 impl<'a, T: GenericImageView> Iterator for Lines<'a, T> {
     type Item = Line<'a, T>;
-    fn next(&mut self) -> Option<Line<'a, T>> {
+    fn next(&mut self) -> Option<Self::Item> {
         if self.y >= self.height {
             None
         } else {
@@ -41,6 +49,18 @@ impl<'a, T: GenericImageView> Iterator for Lines<'a, T> {
             };
             self.y += 1;
             Some(line)
+        }
+    }
+    fn nth(&mut self, index: usize) -> Option<Self::Item> {
+        if self.y >= self.height {
+            None
+        } else {
+            Some(Line {
+                image: self.image,
+                x: 0,
+                y: index as _,
+                width: self.width,
+            })
         }
     }
 }

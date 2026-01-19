@@ -4,7 +4,7 @@ pub trait Preprocessor {
     fn process(&self, image: &DynamicImage) -> DynamicImage;
 }
 
-/// Basic grayscale + resize preprocessor
+/// A basic preprocessor that resizes the image
 pub struct BasicPreprocessor {
     pub dimensions: (u32, u32),
 }
@@ -23,7 +23,7 @@ impl Preprocessor for BasicPreprocessor {
     }
 }
 
-/// Null preprocessor
+/// A null preprocessor that applies no pre-processing to the image
 pub struct NullPreprocessor;
 
 impl Preprocessor for NullPreprocessor {

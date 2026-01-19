@@ -1,9 +1,12 @@
-use ascii_img2::prelude::{Preprocessor as _, *};
+use ascii_img2::prelude::*;
 use clap::{Parser, ValueEnum};
 use image::{open, GenericImageView as _};
 
+mod preprocessor;
+use preprocessor::{Preprocessor as _, *};
+
 // TODO: this does not apply to all monospace fonts
-const CHARACTER_ASPECT_RATIO: f32 = 2.0;
+const CHARACTER_ASPECT_RATIO: u32 = 2;
 
 #[derive(Clone, Default, ValueEnum)]
 enum GeneratorEnum {
@@ -57,8 +60,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let process = {
         let dimensions = match (cli.width, cli.height) {
             (Some(width), Some(height)) => (width, height),
-            (Some(width), None) => (width, (width as f32 / CHARACTER_ASPECT_RATIO) as u32),
-            (None, Some(height)) => ((height as f32 * CHARACTER_ASPECT_RATIO) as u32, height),
+            (Some(width), None) => (width, width / CHARACTER_ASPECT_RATIO),
+            (None, Some(height)) => (height * CHARACTER_ASPECT_RATIO, height),
             (None, None) => image.dimensions(),
         };
 
@@ -70,8 +73,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let charset = LinearCharset::new(
         cli.charset
-            .map(|v| v.chars().collect::<Vec<char>>())
-            .unwrap_or_else(|| vec![' ', ';', '#']),
+            .map_or_else(|| vec![' ', ';', '#'], |v| v.chars().collect()),
     );
 
     let colorizer: Box<dyn Colorizer<image::Rgb<u8>>> = match cli.colorizer.unwrap_or_default() {

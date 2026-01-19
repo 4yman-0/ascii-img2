@@ -1,9 +1,19 @@
+//! Character set module
+
 use alloc::vec::Vec;
 
 pub trait Charset: Send + Sync {
     fn map(&self, luminance: f32) -> char;
 }
 
+/// A character set where all characters are uniformly distributed across the luminance range
+/// ```
+/// use ascii_img2::prelude::*;
+/// let charset = LinearCharset::new(vec![' ', ';', '&']);
+/// assert_eq!(charset.map(0.0), ' ');
+/// assert_eq!(charset.map(0.5), ';');
+/// assert_eq!(charset.map(1.0), '&');
+/// ```
 pub struct LinearCharset {
     chars: Vec<char>,
 }
