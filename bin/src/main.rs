@@ -1,8 +1,9 @@
 use ascii_img2::{Preprocessor as _, *};
 use clap::{Parser, ValueEnum};
-use image::{GenericImageView as _, open};
+use image::{open, GenericImageView as _};
 
-const CHARACTER_ASPECT_RATIO: f32 = 2.2;
+// TODO: this does not apply to all monospace fonts
+const CHARACTER_ASPECT_RATIO: f32 = 2.0;
 
 #[derive(Clone, Default, ValueEnum)]
 enum GeneratorEnum {
@@ -73,23 +74,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap_or_else(|| vec![' ', ';', '#']),
     );
 
-    let colorizer: Box<dyn Colorizer> = match cli.colorizer.unwrap_or_default() {
-    	ColorizerEnum::Null => Box::new(NullColorizer),
-    	ColorizerEnum::AnsiRgb => Box::new(AnsiRgbColorizer),
-    	ColorizerEnum::Ansi256 => Box::new(Ansi256Colorizer),
+    let colorizer: Box<dyn Colorizer<image::Rgb<u8>>> = match cli.colorizer.unwrap_or_default() {
+        ColorizerEnum::Null => Box::new(NullColorizer),
+        ColorizerEnum::AnsiRgb => Box::new(AnsiRgbColorizer),
+        ColorizerEnum::Ansi256 => Box::new(Ansi256Colorizer),
     };
 
     let grid = match cli.generator.unwrap_or_default() {
-        GeneratorEnum::Charset => CharsetGenerator.generate(
-        	&process.into(),
-        	&charset,
-        	colorizer.as_ref()
-        )?,
-        GeneratorEnum::HalfBlock => HalfBlockGenerator.generate(
-        	&process.into(),
-        	&charset,
-        	colorizer.as_ref()
-        )?,
+        GeneratorEnum::Charset => {
+            CharsetGenerator.generate(&process.into(), &charset, colorizer.as_ref())?
+        }
+        GeneratorEnum::HalfBlock => {
+            HalfBlockGenerator.generate(&process.into(), &charset, colorizer.as_ref())?
+        }
     };
 
     for line in grid {

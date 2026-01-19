@@ -28,7 +28,6 @@ pub struct NullPreprocessor;
 
 impl Preprocessor for NullPreprocessor {
     fn process(&self, image: &DynamicImage) -> DynamicImage {
-    	image.clone()
+        image.clone()
     }
 }
-
