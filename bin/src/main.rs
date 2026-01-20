@@ -92,7 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     for line in grid {
-        println!("{line}");
+        println!("{line}\x1b[0m");
     }
 
     Ok(())

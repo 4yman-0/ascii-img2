@@ -1,5 +1,5 @@
 use crate::prelude::{AsciiResult, Charset, Colorizer};
-use alloc::{string::String, vec::Vec};
+use alloc::{/*format,*/ string::String, vec::Vec};
 use core::iter::FromIterator;
 use image::{GenericImageView, Primitive, Rgb, RgbImage};
 
@@ -59,7 +59,7 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
     }
 }
 
-/// An ASCII generator that uses Unicode half block
+/// An ASCII generator that uses Unicode half blocks
 /// This generator must be used with a colorizer other than `NullColorizer`
 /// ```
 /// use ascii_img2::prelude::*;
@@ -72,6 +72,7 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
 ///     &colorizer,
 /// );
 /// ```
+#[derive(Clone)]
 pub struct HalfBlockGenerator;
 
 impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
@@ -83,21 +84,20 @@ impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
     ) -> AsciiResult<Vec<String>> {
         let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
         let mut lines = image.lines();
-        
+
         while let (Some(top_iter), Some(bottom_iter)) = (lines.next(), lines.next()) {
             result.push(
                 top_iter
                     .zip(bottom_iter)
                     .flat_map(|(top, bottom)| {
-                        let fg = colorizer.fg(&top);
-                        let bg = colorizer.bg(&bottom);
+                        let bg = colorizer.bg(&top);
+                        let fg = colorizer.fg(&bottom);
 
                         fg.chars()
                             .chain(bg.chars())
-                            .chain(['▀'])
+                            .chain(['▄'])
                             .collect::<Vec<char>>()
                     })
-                    .chain("\x1b[0m".chars()) // reset at EOL
                     .collect(),
             );
         }
