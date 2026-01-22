@@ -8,5 +8,4 @@ pub type AsciiResult<T> = Result<T, AsciiError>;
 pub enum AsciiError {
     #[error("image error: {0}")]
     Image(ImageError),
-    // etc
 }

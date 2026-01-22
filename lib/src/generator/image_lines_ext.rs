@@ -26,6 +26,11 @@ impl<'a, T: GenericImageView> Iterator for Line<'a, T> {
             Some(self.image.get_pixel(index as _, self.y))
         }
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+    	let (width, x) = (self.width as usize, self.x as usize); 
+    	(width - x, Some(width - x))
+    }
 }
 
 pub struct Lines<'a, T: GenericImageView> {

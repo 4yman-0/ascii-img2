@@ -3,17 +3,17 @@
 use alloc::string::String;
 use image::{Pixel, Rgb};
 
-/// Converts a pixel to a string representation (like ANSI's 24-bit and 8-bit color encoding)
+/// Converts a pixel to a string representation (like ANSI's 24-bit and 8-bit color encoding).
 pub trait Colorizer<T: Pixel> {
-    /// Converts a pixel to a string that controls the color of the character being printed
+    /// Converts a pixel to a string that controls the color of the character being printed.
     fn fg(&self, pixel: &T) -> String;
 
-    /// Converts a pixel to a string that controls the color of the character's background
+    /// Converts a pixel to a string that controls the color of the character's background.
     fn bg(&self, pixel: &T) -> String;
 }
 
-/// Returns an empty string no matter what pixel is provided
-/// ```
+/// A `Colorizer` that returns an empty string no matter what pixel is provided.
+/// ```rust
 /// use ascii_img2::prelude::*;
 /// let color = image::Rgb::from([255, 0, 255]);
 /// assert_eq!(NullColorizer.fg(&color), "");
@@ -29,7 +29,7 @@ impl<T: Pixel> Colorizer<T> for NullColorizer {
     }
 }
 
-/// ANSI color encoding helpers
+/// ANSI color encoding helpers.
 mod ansi {
     use alloc::{format, string::String};
     //pub const RESET: &str = "\x1b[0m";
@@ -48,18 +48,18 @@ mod ansi {
 
     #[must_use]
     const fn rgb_to_256(r: u8, g: u8, b: u8) -> u8 {
-        // Check for grayscale first
+        // Check for grayscale first.
         if r == g && g == b {
             if r > 253 {
                 return 255;
             }
-            // convert grayscale to 0-23 range
+            // convert grayscale to 0-23 range.
             let grayscale = (r as u16 * 24 / 255) as u8;
             assert!(grayscale <= 24);
             return 232 + grayscale;
         }
 
-        // Convert RGB to 0–5 range
+        // Convert RGB to 0–5 range.
         let r = (r as u16 * 5 / 255) as u8;
         let g = (g as u16 * 5 / 255) as u8;
         let b = (b as u16 * 5 / 255) as u8;
@@ -68,7 +68,7 @@ mod ansi {
         assert!(g <= 5);
         assert!(b <= 5);
 
-        // 16 is the start of the 6×6×6 color cube
+        // 16 is the start of the 6×6×6 color cube.
         16 + (36 * r) + (6 * g) + b
     }
 
@@ -85,6 +85,14 @@ mod ansi {
     }
 }
 
+/// A `Colorizer` that returns the ANSI escape code for 24-bit colors.
+/// ```rust
+/// use ascii_img2::prelude::*;
+/// assert_eq!(
+///     AnsiRgbColorizer.fg(&image::Rgb::from([130, 100, 100])),
+///     "\x1b[38;2;130;100;100m"
+/// );
+/// ```
 pub struct AnsiRgbColorizer;
 
 impl Colorizer<Rgb<u8>> for AnsiRgbColorizer {
@@ -96,6 +104,15 @@ impl Colorizer<Rgb<u8>> for AnsiRgbColorizer {
     }
 }
 
+
+/// A `Colorizer` that returns the appriximate 8-bit ANSI representation of a 24-bit color.
+/// ```rust
+/// use ascii_img2::prelude::*;
+/// assert_eq!(
+///     AnsiRgbColorizer.fg(&image::Rgb::from([130, 100, 100])),
+///     "\x1b[38;2;130;100;100m"
+/// );
+/// ```
 pub struct Ansi256Colorizer;
 
 impl Colorizer<Rgb<u8>> for Ansi256Colorizer {

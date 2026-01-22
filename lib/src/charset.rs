@@ -2,12 +2,13 @@
 
 use alloc::vec::Vec;
 
+/// A character set
 pub trait Charset: Send + Sync {
     fn map(&self, luminance: f32) -> char;
 }
 
 /// A character set where all characters are uniformly distributed across the luminance range
-/// ```
+/// ```rust
 /// use ascii_img2::prelude::*;
 /// let charset = LinearCharset::new(vec![' ', ';', '&']);
 /// assert_eq!(charset.map(0.0), ' ');

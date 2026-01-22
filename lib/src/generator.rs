@@ -16,7 +16,7 @@ pub trait AsciiGenerator<T: GenericImageView> {
 }
 
 /// An ASCII generator that uses the `Charset` provided to it
-/// ```
+/// ```rust
 /// use ascii_img2::prelude::*;
 /// let image = image::RgbImage::new(10, 10);
 /// let charset = LinearCharset::new(vec![' ', ';', '&']);
@@ -59,9 +59,9 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
     }
 }
 
-/// An ASCII generator that uses Unicode half blocks
-/// This generator must be used with a colorizer other than `NullColorizer`
-/// ```
+/// An ASCII generator that uses Unicode half blocks.
+/// This generator must be used with a colorizer other than `NullColorizer`.
+/// ```rust
 /// use ascii_img2::prelude::*;
 /// let image = image::RgbImage::new(10, 10);
 /// let charset = LinearCharset::new(vec![' ', ';', '&']);
