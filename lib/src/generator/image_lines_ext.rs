@@ -28,8 +28,8 @@ impl<'a, T: GenericImageView> Iterator for Line<'a, T> {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-    	let (width, x) = (self.width as usize, self.x as usize); 
-    	(width - x, Some(width - x))
+        let (width, x) = (self.width as usize, self.x as usize);
+        (width - x, Some(width - x))
     }
 }
 

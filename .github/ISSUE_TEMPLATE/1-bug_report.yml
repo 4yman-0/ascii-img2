@@ -1,0 +1,59 @@
+name: Bug Report
+description: Create a report to help improve this project
+title: 'bug: '
+labels: [bug-report]
+body:
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      description: Please ensure you have completed all of the following.
+      options:
+        - label: I have searched for [existing issues](https://github.com/4yman-0/ascii-img2/issues) that already report this problem, without success.
+          required: true
+
+  - type: input
+    attributes:
+      label: Affected Version
+      description: Which version(s) this issue impact?
+      placeholder: 0.1.X
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A clear description of what the bug is and how it manifests.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear description of what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Explain the steps required to reproduce this issue.
+      placeholder: |
+        1. Go to '...'
+        2. Run '...'
+        3. Observe: '...'
+    validations:
+      required: true
+
+  - type: input
+    id: reproduction-url
+    attributes:
+      label: Code Reproduction URL
+      description: Link to the project where the bug is.
+      placeholder: https://github.com/...
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: List any other information that is relevant to your issue. Stack traces, related issues, suggestions on how to fix, Stack Overflow links, forum links, etc.

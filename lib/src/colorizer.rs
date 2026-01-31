@@ -1,14 +1,14 @@
-//! Color generation module
+//! "Colorizer" module.
 
 use alloc::string::String;
 use image::{Pixel, Rgb};
 
-/// Converts a pixel to a string representation (like ANSI's 24-bit and 8-bit color encoding).
+/// Converts a pixel to a prefix representation (like ANSI's 24-bit and 8-bit color encoding).
 pub trait Colorizer<T: Pixel> {
-    /// Converts a pixel to a string that controls the color of the character being printed.
+    /// Converts a pixel to a prefix that controls the color of the character being printed.
     fn fg(&self, pixel: &T) -> String;
 
-    /// Converts a pixel to a string that controls the color of the character's background.
+    /// Converts a pixel to a prefix that controls the color of the character's background.
     fn bg(&self, pixel: &T) -> String;
 }
 
@@ -103,7 +103,6 @@ impl Colorizer<Rgb<u8>> for AnsiRgbColorizer {
         ansi::bg_rgb(pixel[0], pixel[1], pixel[2])
     }
 }
-
 
 /// A `Colorizer` that returns the appriximate 8-bit ANSI representation of a 24-bit color.
 /// ```rust

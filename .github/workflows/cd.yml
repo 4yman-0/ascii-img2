@@ -1,0 +1,38 @@
+name: "CD"
+
+on:
+  release:
+    types: [published]
+env:
+  CARGO_TERM_COLOR: always
+concurrency: 
+  group: 'cd'
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-slim
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: cargo login
+        run: cargo login "$CRATES_IO_API_TOKEN"
+        env:
+         CRATES_IO_API_TOKEN: ${{ secrets.CRATES_IO_API_TOKEN }}
+
+      - name: cargo release publish
+        continue-on-error: true
+        run: |-
+          for crate in bin lib; do
+            cargo publish -p $crate
+          done

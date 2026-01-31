@@ -1,6 +1,5 @@
 use crate::prelude::{AsciiResult, Charset, Colorizer};
-use alloc::{/*format,*/ string::String, vec::Vec};
-use core::iter::FromIterator;
+use alloc::{format, string::String, vec::Vec};
 use image::{GenericImageView, Primitive, Rgb, RgbImage};
 
 mod image_lines_ext;
@@ -51,11 +50,15 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
                 line.map(|pixel| {
                     let lum = Self::luminance(&pixel);
                     let char = charset.map(lum);
-                    String::from_iter(colorizer.fg(&pixel).chars().chain([char]))
+                    colorizer
+                        .fg(&pixel)
+                        .chars()
+                        .chain([char])
+                        .collect::<String>()
                 })
-                .collect::<String>()
+                .collect()
             })
-            .collect::<Vec<_>>())
+            .collect())
     }
 }
 
@@ -89,14 +92,11 @@ impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
             result.push(
                 top_iter
                     .zip(bottom_iter)
-                    .flat_map(|(top, bottom)| {
+                    .map(|(top, bottom)| {
                         let bg = colorizer.bg(&top);
                         let fg = colorizer.fg(&bottom);
 
-                        fg.chars()
-                            .chain(bg.chars())
-                            .chain(['▄'])
-                            .collect::<Vec<char>>()
+                        format!("{}{}▄", fg, bg)
                     })
                     .collect(),
             );
