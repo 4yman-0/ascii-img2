@@ -1,5 +1,6 @@
 [package]
 name = "ascii-img2"
+description = "ASCII image generation library."
 version = "0.1.0"
 edition = "2018"
 keywords = [
@@ -9,6 +10,9 @@ keywords = [
 ]
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
+authors = [ "4yman-0" ]
+documentation = "https://docs.rs/ascii-img2"
+repository = "https://github.com/4yman-0/ascii-img2"
 
 [dependencies]
 image = { version = "0.25.9", default-features = false }
