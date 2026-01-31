@@ -13,6 +13,9 @@ jobs:
   publish:
     runs-on: ubuntu-slim
     timeout-minutes: 30
+    environment: CD
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -25,13 +28,13 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: cargo login
-        run: cargo login "$CRATES_IO_API_TOKEN"
-        env:
-         CRATES_IO_API_TOKEN: ${{ secrets.CRATES_IO_API_TOKEN }}
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
 
-      - name: cargo release publish
+      - name: Cargo publish
         continue-on-error: true
+        env:
+          CRATES_IO_API_TOKEN: ${{ steps.auth.outputs.token }}
         run: |-
           for crate in bin lib; do
             cargo publish -p $crate

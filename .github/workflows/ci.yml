@@ -25,7 +25,7 @@ jobs:
           path: |
             ~/.cargo/registry
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run `cargo check`
         run: cargo check --tests --verbose
