@@ -3,7 +3,7 @@
 use alloc::vec::Vec;
 
 /// A character set.
-pub trait Charset: Send + Sync {
+pub trait Charset: Sync {
     fn map(&self, luminance: f32) -> char;
 }
 

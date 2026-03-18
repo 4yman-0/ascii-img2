@@ -1,17 +1,17 @@
 use crate::prelude::{AsciiResult, Charset, Colorizer};
-use alloc::{format, string::String, vec::Vec};
 use image::{GenericImageView, Primitive, Rgb, RgbImage};
 
 mod image_lines_ext;
 use image_lines_ext::LinesTrait as _;
 
 pub trait AsciiGenerator<T: GenericImageView> {
-    fn generate(
+    fn generate<W: core::fmt::Write>(
         &self,
+        writer: &mut W,
         image: &T,
         charset: &dyn Charset,
         colorizer: &dyn Colorizer<T::Pixel>,
-    ) -> AsciiResult<Vec<String>>;
+    ) -> AsciiResult<()>;
 }
 
 /// An ASCII generator that uses the `Charset` provided to it
@@ -38,27 +38,26 @@ impl CharsetGenerator {
 }
 
 impl AsciiGenerator<RgbImage> for CharsetGenerator {
-    fn generate(
+    fn generate<W: core::fmt::Write>(
         &self,
+        writer: &mut W,
         image: &RgbImage,
         charset: &dyn Charset,
         colorizer: &dyn Colorizer<Rgb<u8>>,
-    ) -> AsciiResult<Vec<String>> {
-        Ok(image
-            .lines()
-            .map(|line| {
-                line.map(|pixel| {
-                    let lum = Self::luminance(&pixel);
-                    let char = charset.map(lum);
-                    colorizer
-                        .fg(&pixel)
-                        .chars()
-                        .chain([char])
-                        .collect::<String>()
-                })
-                .collect()
-            })
-            .collect())
+    ) -> AsciiResult<()> {
+    	for line in image.lines() {
+			for pixel in line {
+			    let lum = Self::luminance(&pixel);
+			    let character = charset.map(lum);
+				writeln!(
+					writer,
+			    	"{}{character}",
+			    	colorizer
+			    	    .fg(&pixel),
+			    )?;
+			}
+		}
+		Ok(())
     }
 }
 
@@ -79,29 +78,24 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
 pub struct HalfBlockGenerator;
 
 impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
-    fn generate(
+    fn generate<W: core::fmt::Write>(
         &self,
+        writer: &mut W,
         image: &RgbImage,
         _charset: &dyn Charset,
         colorizer: &dyn Colorizer<Rgb<u8>>,
-    ) -> AsciiResult<Vec<String>> {
-        let mut result: Vec<String> = Vec::with_capacity(image.height() as _);
-        let mut lines = image.lines();
+    ) -> AsciiResult<()> {
+    	let mut lines = image.lines();
+		
+        while let (Some(top_line), Some(bottom_line)) = (lines.next(), lines.next()) {
+            for (top, bottom) in top_line.zip(bottom_line) {
+				let bg = colorizer.bg(&top);
+				let fg = colorizer.fg(&bottom);
 
-        while let (Some(top_iter), Some(bottom_iter)) = (lines.next(), lines.next()) {
-            result.push(
-                top_iter
-                    .zip(bottom_iter)
-                    .map(|(top, bottom)| {
-                        let bg = colorizer.bg(&top);
-                        let fg = colorizer.fg(&bottom);
-
-                        format!("{}{}▄", fg, bg)
-                    })
-                    .collect(),
-            );
+				writeln!(writer, "{}{}▄", fg, bg)?;
+			}
         }
 
-        Ok(result)
+        Ok(())
     }
 }

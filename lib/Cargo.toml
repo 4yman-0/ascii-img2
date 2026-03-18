@@ -16,4 +16,9 @@ repository = "https://github.com/4yman-0/ascii-img2"
 
 [dependencies]
 image = { version = "0.25.9", default-features = false }
-thiserror = { version = "2.0.17", default-features = false, features = ["std"] }
+rayon = { version = "1.11.0", optional = true }
+thiserror = { version = "2.0.17", default-features = false }
+
+[features]
+default = []
+rayon = ["image/rayon", "dep:rayon"]

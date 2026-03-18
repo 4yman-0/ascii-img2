@@ -4,7 +4,7 @@ use alloc::string::String;
 use image::{Pixel, Rgb};
 
 /// Converts a pixel to a prefix representation (like ANSI's 24-bit and 8-bit color encoding).
-pub trait Colorizer<T: Pixel> {
+pub trait Colorizer<T: Pixel>: Sync {
     /// Converts a pixel to a prefix that controls the color of the character being printed.
     fn fg(&self, pixel: &T) -> String;
 

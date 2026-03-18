@@ -16,6 +16,6 @@ documentation = "https://docs.rs/ascii-img2-cli"
 repository = "https://github.com/4yman-0/ascii-img2"
 
 [dependencies]
-ascii-img2 = { version = "0.1.0", path = "../lib" }
+ascii-img2 = { version = "0.1.0", path = "../lib", features = [ "rayon" ] }
 clap = { version = "4.5.54", features = ["derive"] }
-image = { version = "0.25.9", default-features = false, features = ["bmp", "gif", "jpeg", "png", "rayon", "tiff", "webp"] }
+image = { version = "0.25.9", default-features = false, features = ["bmp", "gif", "jpeg", "png", "tiff", "webp"] }

@@ -27,6 +27,7 @@ enum ColorizerEnum {
 enum PreprocessorEnum {
     #[default]
     Basic,
+	NearestResize,
     Null,
 }
 
@@ -67,6 +68,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         match cli.preprocessor.unwrap_or_default() {
             PreprocessorEnum::Basic => BasicPreprocessor { dimensions }.process(&image),
+            PreprocessorEnum::NearestResize => NearestResizePreprocessor { dimensions }.process(&image),
             PreprocessorEnum::Null => NullPreprocessor.process(&image),
         }
     };
@@ -82,18 +84,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ColorizerEnum::Ansi256 => Box::new(Ansi256Colorizer),
     };
 
-    let grid = match cli.generator.unwrap_or_default() {
+    let mut grid = String::new();
+     match cli.generator.unwrap_or_default() {
         GeneratorEnum::Charset => {
-            CharsetGenerator.generate(&process.into(), &charset, colorizer.as_ref())?
+            CharsetGenerator.generate(&mut grid, &process.into(), &charset, colorizer.as_ref())?
         }
         GeneratorEnum::HalfBlock => {
-            HalfBlockGenerator.generate(&process.into(), &charset, colorizer.as_ref())?
+            HalfBlockGenerator.generate(&mut grid, &process.into(), &charset, colorizer.as_ref())?
         }
     };
 
-    for line in grid {
-        println!("{line}\x1b[0m");
-    }
+	println!("{grid}\x1b[0m");
 
     Ok(())
 }
