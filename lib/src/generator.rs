@@ -20,7 +20,9 @@ pub trait AsciiGenerator<T: GenericImageView> {
 /// let image = image::RgbImage::new(10, 10);
 /// let charset = LinearCharset::new(vec![' ', ';', '&']);
 /// let colorizer = NullColorizer;
+/// let mut output = String::new();
 /// CharsetGenerator.generate(
+///     &mut output,
 ///     &image,
 ///     &charset,
 ///     &colorizer,
@@ -68,7 +70,9 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
 /// let image = image::RgbImage::new(10, 10);
 /// let charset = LinearCharset::new(vec![' ', ';', '&']);
 /// let colorizer = AnsiRgbColorizer;
+/// let mut output = String::new();
 /// HalfBlockGenerator.generate(
+///     &mut output,
 ///     &image,
 ///     &charset,
 ///     &colorizer,
