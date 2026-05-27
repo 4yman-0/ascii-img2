@@ -14,7 +14,7 @@ pub trait AsciiGenerator<T: GenericImageView> {
     ) -> AsciiResult<()>;
 }
 
-/// An ASCII generator that uses the `Charset` provided to it
+/// An ASCII generator.
 /// ```rust
 /// use ascii_img2::prelude::*;
 /// let image = image::RgbImage::new(10, 10);
@@ -51,13 +51,14 @@ impl AsciiGenerator<RgbImage> for CharsetGenerator {
 			for pixel in line {
 			    let lum = Self::luminance(&pixel);
 			    let character = charset.map(lum);
-				writeln!(
+				write!(
 					writer,
 			    	"{}{character}",
 			    	colorizer
 			    	    .fg(&pixel),
 			    )?;
 			}
+			writeln!(writer, "\x1b[0m")?;
 		}
 		Ok(())
     }
@@ -96,8 +97,9 @@ impl AsciiGenerator<RgbImage> for HalfBlockGenerator {
 				let bg = colorizer.bg(&top);
 				let fg = colorizer.fg(&bottom);
 
-				writeln!(writer, "{}{}▄", fg, bg)?;
+				write!(writer, "{}{}▄", fg, bg)?;
 			}
+			writeln!(writer, "\x1b[0m")?;
         }
 
         Ok(())

@@ -94,7 +94,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-	println!("{grid}\x1b[0m");
-
+	print!("{grid}");
+	
     Ok(())
 }
